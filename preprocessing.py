@@ -1,20 +1,13 @@
 import numpy as np
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-sns.set_theme(style='dark', color_codes=True, font_scale=1.5)
 
 #NLP
 import nltk
 from nltk.tokenize import sent_tokenize
 # from nltk.tag import pos_tag
 from nltk.stem.snowball import SnowballStemmer #You can call SnowballStemmer, but I believe everything we are working with is in English
-from nltk.stem import WordNetLemmatizer 
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from sklearn.base import BaseEstimator, TransformerMixin
-from sklearn.pipeline import Pipeline
-from sklearn.metrics import classification_report
-from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification, pipeline
+from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification
 from scipy.special import softmax
 
 import warnings
