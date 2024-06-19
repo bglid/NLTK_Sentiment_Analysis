@@ -1,5 +1,4 @@
 import numpy as np
-
 #NLP
 import nltk
 from nltk.tokenize import sent_tokenize
@@ -7,8 +6,8 @@ from nltk.tokenize import sent_tokenize
 from nltk.stem.snowball import SnowballStemmer #You can call SnowballStemmer, but I believe everything we are working with is in English
 from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from sklearn.base import BaseEstimator, TransformerMixin
-from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification
 from scipy.special import softmax
+from transformers import AutoConfig
 
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning) 
@@ -17,12 +16,8 @@ warnings.filterwarnings("ignore", category=UserWarning)
 
 #Transformer setup
 MODEL = 'cardiffnlp/twitter-roberta-base-sentiment-latest'
-tokenizer = AutoTokenizer.from_pretrained(MODEL, add_prefix_space=True)
+# tokenizer = AutoTokenizer.from_pretrained(MODEL, add_prefix_space=True)
 config = AutoConfig.from_pretrained(MODEL)
-
-#Setting this up with Torch
-model = AutoModelForSequenceClassification.from_pretrained(MODEL)
-
 
 #NLTK Preprocessing
 class NLTKPreprocessing(BaseEstimator, TransformerMixin):
@@ -97,7 +92,7 @@ class BertScorer(BaseEstimator, TransformerMixin):
     def fit(self, X, y = None):
         return self
     
-    def transform(self, model, tokenizer, X, y = None):
+    def transform(self, X, model, tokenizer, y = None):
         #Encoding the pre-tokenized tokens
         scores = []
         labels = []
@@ -113,5 +108,5 @@ class BertScorer(BaseEstimator, TransformerMixin):
             scores.append(score)
             labels.append(label)
         
-        return scores, labels
+        return labels
     
