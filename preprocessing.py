@@ -14,6 +14,10 @@ warnings.filterwarnings("ignore", category=DeprecationWarning)
 warnings.filterwarnings("ignore", category=FutureWarning) 
 warnings.filterwarnings("ignore", category=UserWarning) 
 
+#Downloading necessary NLTK libraries if not available
+nltk.download('punkt')
+nltk.download('vader_lexicon')
+
 #Transformer setup
 MODEL = 'cardiffnlp/twitter-roberta-base-sentiment-latest'
 # tokenizer = AutoTokenizer.from_pretrained(MODEL, add_prefix_space=True)
@@ -29,8 +33,11 @@ class NLTKPreprocessing(BaseEstimator, TransformerMixin):
     def transform(self, X, y=None):
         #Tokenizing each row in a Dataframe
         tokenized_text = []
-        for doc in X:
-            tokenized_text.append(sent_tokenize(doc))
+        #7/17/24: Removing this for the streamlit app
+        #Initially this was for processing a large amount of reviews, but breaks when there's only one.
+        #for doc in X:
+        #    tokenized_text.append(sent_tokenize(doc))
+        tokenized_text.append(sent_tokenize(X)) 
             
         #Stemming the now tokenized lists of text
         stemmer = SnowballStemmer(language='english') 
@@ -49,18 +56,20 @@ class NLTKPreprocessing(BaseEstimator, TransformerMixin):
 def review_sentiment(review):
     #Init Sentiment Analysis 
     sid = SentimentIntensityAnalyzer() 
-    review_sentiment = []
-    #counter variables for getting the average score
-    count = 0.0
+    # ~~7/17/2024 BHG: Potentially remove this for Streamlit app. The following lines were needed in the notebook analysis, but not production app
+    # counter variables for getting the average score
+    # count = 0.0
     score = 0.0
     #Getting the sentiment of each sentence in the review
     for sentence in review:
         sentence_polarity = sid.polarity_scores(sentence)
         score += sentence_polarity['compound']
-        count += 1
+    #     # count += 1
+
     #calculating the overall sentiment by way of the mean of each polarity score
-    review_score = round((score / count), 4)
-    return review_score
+    review_score = round(score, 4)
+    # review_score = round((score / count), 4)
+    return sentence_polarity
 
 #Creating our Scikit-Learn Transformer for getting each review's sentiment:
 class VaderSentimentScorer(BaseEstimator, TransformerMixin):
