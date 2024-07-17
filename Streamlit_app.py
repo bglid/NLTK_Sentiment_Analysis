@@ -7,12 +7,16 @@ import preprocessing
 #For pipeline building
 from sklearn.pipeline import make_pipeline
 
+import warnings
+warnings.filterwarnings("ignore", category=DeprecationWarning) 
+warnings.filterwarnings("ignore", category=FutureWarning) 
+warnings.filterwarnings("ignore", category=UserWarning) 
+
 
 #Transformer setup
 MODEL = 'cardiffnlp/twitter-roberta-base-sentiment-latest'
 tokenizer = AutoTokenizer.from_pretrained(MODEL, add_prefix_space=True)
 config = AutoConfig.from_pretrained(MODEL)
-
 #Setting this up with Torch
 model = AutoModelForSequenceClassification.from_pretrained(MODEL)
 
@@ -30,9 +34,10 @@ def main():
     clicked = st.button('Submit')
 
     #Setting up each column (for NLTK vs Roberta)
-    col1, col2 = st.columns(2, gap='large')
-    col1.header('NLTK')
-    col2.header('Bert')
+    col1, col2, col3 = st.columns(3, gap='large')
+    col1.header('Trained NB Classifier')
+    col2.header('Vader')
+    col3.header('Bert')
         
     #tokenizing and scoring the text upon submission
     if clicked == True:
@@ -41,12 +46,12 @@ def main():
         
         tokens = nltk_preprocessor.fit_transform(text)
 
-        # with col1:
-            # with st.spinner('Scoring the Sentiment of the Text...'):
-                # vader_score = vader_scorer.fit_transform(tokens)
-                # st.write(vader_score)
-        
         with col2:
+            with st.spinner('Scoring the Sentiment of the Text...'):
+                vader_score = vader_scorer.fit_transform(tokens)
+                st.write(vader_score)
+        
+        with col3:
             with st.spinner('Scoring the Sentiment of the Text...'):
                 bert_score = bert_scorer.transform(tokens, model=model, tokenizer=tokenizer)
                 st.write(bert_score)
