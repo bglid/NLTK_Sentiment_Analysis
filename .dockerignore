@@ -1,0 +1,11 @@
+#Excluding Datasets
+Datasets/*
+
+#Excluding git
+.git
+
+#Excluding Readme
+README.md
+
+#Excluding License
+LICENSE
