@@ -8,6 +8,8 @@ from nltk.sentiment.vader import SentimentIntensityAnalyzer
 from sklearn.base import BaseEstimator, TransformerMixin
 from scipy.special import softmax
 from transformers import AutoConfig
+import spacy
+from spacytextblob.spacytextblob import SpacyTextBlob
 
 import warnings
 warnings.filterwarnings("ignore", category=DeprecationWarning) 
@@ -17,6 +19,10 @@ warnings.filterwarnings("ignore", category=UserWarning)
 #Downloading necessary NLTK libraries if not available
 nltk.download('punkt')
 nltk.download('vader_lexicon')
+
+#spacy setup
+nlp = spacy.load('en_core_web_sm')
+nlp.add_pipe('spacytextblob')
 
 #Transformer setup
 MODEL = 'cardiffnlp/twitter-roberta-base-sentiment-latest'
@@ -94,6 +100,11 @@ def score_classifier(sentiment_score, pos_threshold = 0.3, neg_threshold = -0.3)
         return 'Negative'
     else:
         return 'Neutral'
+    
+#spaCy-based sentiment scoring function
+#Potentially build this as a class
+def spacy_sentiment(review):
+    pass
     
     
 #Transformer-based Scoring pipeline
