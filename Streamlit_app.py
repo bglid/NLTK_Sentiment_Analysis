@@ -35,8 +35,8 @@ def main():
 
     #Setting up each column (for NLTK vs Roberta)
     col1, col2, col3 = st.columns(3, gap='large')
-    col1.header('Trained NB Classifier')
-    col2.header('Vader')
+    col1.header('Vader')
+    col2.header('spaCy')
     col3.header('Bert')
         
     #tokenizing and scoring the text upon submission
@@ -46,14 +46,16 @@ def main():
         
         tokens = nltk_preprocessor.fit_transform(text)
 
-        with col2:
+        with col1:
             with st.spinner('Scoring the Sentiment of the Text...'):
                 vader_score = vader_scorer.fit_transform(tokens)
+                #converted_vader = preprocessing.score_classifier(vader_score)
                 st.write(vader_score)
         
         with col3:
             with st.spinner('Scoring the Sentiment of the Text...'):
                 bert_score = bert_scorer.transform(tokens, model=model, tokenizer=tokenizer)
+                #converted_bert = preprocessing.score_classifier(bert_score)
                 st.write(bert_score)
                 
 if __name__ == "__main__":
