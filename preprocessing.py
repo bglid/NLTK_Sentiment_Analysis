@@ -21,7 +21,7 @@ nltk.download('punkt')
 nltk.download('vader_lexicon')
 
 #spacy setup
-nlp = spacy.load('en_core_web_sm')
+nlp = spacy.load('en_core_web_sm', disable=['attribute_ruler'])
 nlp.add_pipe('spacytextblob')
 
 #Transformer setup
@@ -102,10 +102,13 @@ def score_classifier(sentiment_score, pos_threshold = 0.3, neg_threshold = -0.3)
         return 'Neutral'
     
 #spaCy-based sentiment scoring function
-#Potentially build this as a class
+print(nlp.pipe_names) #analyzing pipes to see if there are any that aren't needed
 def spacy_sentiment(review):
-    pass
+    doc = nlp(review)
+    return doc._.blob.polarity
     
+
+
     
 #Transformer-based Scoring pipeline
 class BertScorer(BaseEstimator, TransformerMixin): 
