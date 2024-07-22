@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 import streamlit as st 
 import logging
 from transformers import AutoTokenizer, AutoConfig, AutoModelForSequenceClassification
@@ -51,12 +52,24 @@ def main():
                 vader_score = vader_scorer.fit_transform(tokens)
                 #converted_vader = preprocessing.score_classifier(vader_score)
                 st.write(vader_score)
+                
+                
+        with col2:
+            with st.spinner('Scoring the Sentiment of the Text...'):
+                spacy_score = preprocessing.spacy_sentiment(text)
+                st.write(spacy_score)
         
         with col3:
             with st.spinner('Scoring the Sentiment of the Text...'):
                 bert_score = bert_scorer.transform(tokens, model=model, tokenizer=tokenizer)
                 #converted_bert = preprocessing.score_classifier(bert_score)
                 st.write(bert_score)
+        
+        #need to work on compiling the scores into something comparable
+        list_of_scores = [vader_score[0]['compound'], spacy_score, bert_score[0]]        
+        fig, ax = plt.subplots()
+        ax.hist(list_of_scores)
+        st.pyplot(fig)
                 
 if __name__ == "__main__":
     main()
