@@ -28,11 +28,18 @@ def main():
     bert_scorer = preprocessing.BertScorer()
 
     #Setting up the streamlit app
-    st.title('Sentiment Analysis Comparison')
-    st.subheader('NLTK vs. Roberta')
+    st.title('Multilingual Sentiment Analysis Comparison')
+    st.subheader('Vader vs. spaCy vs. Roberta')
 
     text = st.text_input('Text for Sentiment Analyzer')
-    clicked = st.button('Submit')
+    # clicked_disabled = st.button('Submit', help='Enter some text!', disabled=True, key=0 )
+
+    #Disabling the click button if text is blank
+    if text != '':
+        clicked = st.button('Submit', help='Enter some text!', disabled=False)
+    else:
+        clicked = st.button('Submit', help='Enter some text!', disabled=True)
+        
 
     #Setting up each column (for NLTK vs Roberta)
     col1, col2, col3 = st.columns(3, gap='large')
@@ -42,31 +49,41 @@ def main():
         
     #tokenizing and scoring the text upon submission
     if clicked == True:
-        logging.basicConfig(filename='streamlit.log', level=logging.DEBUG,
-                    format='%(asctime)s - %(message)s', datefmt='%d-%b')
-        
-        tokens = nltk_preprocessor.fit_transform(text)
+        try:
+            logging.basicConfig(filename='streamlit.log', level=logging.DEBUG,
+                        format='%(asctime)s - %(message)s', datefmt='%d-%b')
+            
+            tokens = nltk_preprocessor.fit_transform(text)
 
-        with col1:
-            with st.spinner('Scoring the Sentiment of the Text...'):
-                vader_score = vader_scorer.fit_transform(tokens)
-                #converted_vader = preprocessing.score_classifier(vader_score)
-                st.write(vader_score)
-                
-                
-        with col2:
-            with st.spinner('Scoring the Sentiment of the Text...'):
-                spacy_score = preprocessing.spacy_sentiment(text)
-                st.write(spacy_score)
-        
-        with col3:
-            with st.spinner('Scoring the Sentiment of the Text...'):
-                bert_score = bert_scorer.transform(tokens, model=model, tokenizer=tokenizer)
-                #converted_bert = preprocessing.score_classifier(bert_score)
-                st.write(bert_score)
+            with col1:
+                with st.spinner('Scoring the Sentiment of the Text...'):
+                    vader_score = vader_scorer.fit_transform(tokens)
+                    converted_vader = preprocessing.score_classifier(vader_score[0]['compound'])
+                    st.write('Score:', vader_score[0]['compound'])
+                    st.write(converted_vader)
+                    
+                    
+            with col2:
+                with st.spinner('Scoring the Sentiment of the Text...'):
+                    spacy_score = preprocessing.spacy_sentiment(text)
+                    converted_spacy = preprocessing.score_classifier(spacy_score)
+                    st.write('Score:', spacy_score)
+                    st.write(converted_spacy)
+            
+            with col3:
+                with st.spinner('Scoring the Sentiment of the Text...'):
+                    bert_score, bert_label = bert_scorer.transform(tokens, model=model, tokenizer=tokenizer)
+                    st.write('Score:', bert_score[0])
+                    st.write(bert_label[0])
+                    
+        except UnboundLocalError:
+            st.write('Please enter in Text for the Sentiment Analyzer to work...')
         
         #need to work on compiling the scores into something comparable
-        list_of_scores = [vader_score[0]['compound'], spacy_score, bert_score[0]]        
+        list_of_scores = [vader_score[0]['compound'], spacy_score, bert_score[0]]
+        
+        #Getting the non-numeric result of each scores
+                
         fig, ax = plt.subplots()
         ax.hist(list_of_scores)
         st.pyplot(fig)
