@@ -131,5 +131,5 @@ class BertScorer(BaseEstimator, TransformerMixin):
             scores.append(score)
             labels.append(label)
         
-        return labels
+        return scores, labels
     
